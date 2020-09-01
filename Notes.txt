@@ -1,0 +1,24 @@
+Downloads
+-------------
+payment gateway android integrations Link:
+--------------------------------------------------
+https://pgandroidintegrations.docs.stoplight.io/
+-----------------------------------------------------
+Our payment gateway android SDK can be downloaded here:
+-----------------------------------------------------------------------
+Download AAR for SDK 19 to 27
+https://www.dropbox.com/s/e9u2hghbwczlvv0/PGSDKVR4.aar?dl=0
+----------------------------------------------------------------------------------
+Download AAR for AndroidX
+https://www.dropbox.com/s/y5afugikeqzgr1m/pgsdkv5ax.aar?dl=0
+-----------------------------------------------------------------------------
+A sample Android App that illustrates the integration of any 
+app with our SDK can be downloaded here:
+------------------------------------------------------------
+Download SampleAPP with AAR for SDK 19 to 27
+https://github.com/paymentgatewayintegration/sampleapp
+------------------------------------------------------------------
+Download SampleAPP with AAR for AndroidX
+https://github.com/paymentgatewayintegration/sampleappandroidx
+------------------------------------------------------------
+

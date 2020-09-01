@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: artifacts:pgsdkv5ax:unspecified@jar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/pgsdkv5ax/build/.transforms/4c4f25a0a3794b4fc497275faa6d378c/jetified-pgsdkv5ax/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/pgsdkv5ax/build/.transforms/4c4f25a0a3794b4fc497275faa6d378c/jetified-pgsdkv5ax/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

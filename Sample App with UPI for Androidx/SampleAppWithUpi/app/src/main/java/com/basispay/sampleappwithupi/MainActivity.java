@@ -1,50 +1,42 @@
-# Basispay-Android-PgKit
-BasisPay Android Payment Gateway kit for developers
+package com.basispay.sampleappwithupi;
 
-## INTRODUCTION
-This document describes the steps for integrating Basispay online payment gateway Android kit.This payment gateway performs the online payment transactions with less user effort. It receives the payment details as input and handles the payment flow. Finally returns the payment response to the user. User has to import the framework manually into their project for using it
+import androidx.appcompat.app.AppCompatActivity;
 
-## Add the JitPack repository to your build file
-Step 1. Add the JitPack repository to your build file
-```
-allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
-	}
-```
-OR
-Android studio 4 and above add the Jitpack to your Setting.gradle file
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
-```
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-        maven { url 'https://jitpack.io' }
+import com.example.paymentgateway.PGConstants;
+import com.example.paymentgateway.PaymentGatewayPaymentInitializer;
+import com.example.paymentgateway.PaymentParams;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Random;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        Button button = findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                paymentAction();
+            }
+        });
     }
-}
-```
-Step 2. Add the dependency app build.gradle
-```
-dependencies {
-	        implementation 'com.github.Baabujiventuress:basispay-android-sdk:Latest-Version'
-	}
-```
 
-## Code Explanation
-
-Make sure you have the below permissions in your manifest file:
-```
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-
-```
-Make sure you have the below code in your main activity:
-```
-Random rnd = new Random();
+    private void paymentAction() {
+        Random rnd = new Random();
         int n = 100000 + rnd.nextInt(900000);
         SampleAppConstants.PG_ORDER_ID=Integer.toString(n);
 
@@ -75,18 +67,14 @@ Random rnd = new Random();
         pgPaymentParams.setOfferCode("testcoupon");
         pgPaymentParams.setSplitEnforceStrict("y");
         pgPaymentParams.setInterface_type("android_sdk");//*required
-   
-```      
-Initailize the com.example.paymentgateway.PaymentGatewayPaymentInitializer class with payment parameters and initiate the payment:
-```
-PaymentGatewayPaymentInitializer pgPaymentInitializer = new PaymentGatewayPaymentInitializer(pgPaymentParams,MainActivity.this);
+
+        PaymentGatewayPaymentInitializer pgPaymentInitializer = new PaymentGatewayPaymentInitializer(pgPaymentParams,MainActivity.this);
         pgPaymentInitializer.initiatePaymentProcess();
 
-```
-## Payment Response
-To receive the json response, override the onActivityResult() using the REQUEST_CODE and PAYMENT_RESPONSE variables from com.example.paymentgateway.PaymentParams class
-```
- @Override
+
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PGConstants.REQUEST_CODE) {
@@ -140,4 +128,4 @@ To receive the json response, override the onActivityResult() using the REQUEST_
         }
     }
 
-```
+}

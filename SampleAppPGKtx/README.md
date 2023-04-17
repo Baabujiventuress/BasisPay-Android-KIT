@@ -18,7 +18,7 @@ dependencyResolutionManagement {
 Step 2. Add the dependency in app module build.gradle file
 ```
 dependencies {
-			//Tag replace to latest version (ex:- 1.0.0)
+			//Tag replace to latest version:- 1.0.2
 	        implementation 'com.github.Baabujiventuress:basispay-pgsdkv2-ktx:Tag'
 	}
 

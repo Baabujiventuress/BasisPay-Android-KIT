@@ -17,7 +17,7 @@ allprojects {
 Step 2. Add the dependency
 ```
 dependencies {
-	        implementation 'com.github.Baabujiventuress:basispay_android_sdkv2:Tag'
+	        implementation 'com.github.Baabujiventuress:basispay_android_sdkv2:1.1.4'
 	}
 ```
 

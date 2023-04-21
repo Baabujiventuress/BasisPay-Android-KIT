@@ -12,9 +12,15 @@ import com.basispaypg.BasisPayPaymentInitializer
 import com.basispaypg.BasisPayPaymentParams
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var response: JSONObject
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -24,36 +30,73 @@ class MainActivity : AppCompatActivity() {
         binding.btn.setOnClickListener(View.OnClickListener {
             makePaymentAction()
         })
+
+        initiate();
+    }
+
+    private fun initiate() {
+        //TODO Create order reference and secure hash from backend rest api services
+        //TODO After get the response to set params for payment action
+        var url: URL? = URL("http://example.com") // Backend api
+        val connection: HttpURLConnection = url?.openConnection() as HttpURLConnection
+
+        try {
+            val br = BufferedReader(InputStreamReader(connection.getInputStream()))
+
+            // use a string builder to bufferize the response body
+            // read from the input strea.
+            val sb = StringBuilder()
+            var line: String?
+            while (br.readLine().also { line = it } != null) {
+                sb.append(line).append('\n')
+            }
+
+            // use the string builder directly,
+            // or convert it into a String
+            response = JSONObject(sb.toString())
+            Log.d("RES", response.toString())
+            //TODO Get ORDER REFERENCE ID form backend api
+            /**
+             *if (response.isSuccessful) {
+            if (response.code() == 200) {
+            response = response.body()
+            }
+            }
+             */
+        } finally {
+            connection.disconnect()
+        }
+
     }
 
     private fun makePaymentAction() {
 
         val pgPaymentParams = BasisPayPaymentParams()
-        pgPaymentParams.setApiKey("API_KEY") //required field(*)
-        pgPaymentParams.setSecureHash("SECURE_HASH") //required field(*)
-        pgPaymentParams.setOrderReference("ORDER_REFERENCE") //required field(*)
-        pgPaymentParams.setCustomerName("CUSTOMER_NAME") //required field(*)
-        pgPaymentParams.setCustomerEmail("CUSTOMER_MAIL") //required field(*)
-        pgPaymentParams.setCustomerMobile("CUSTOMER_MOBILE") //required field(*)
-        pgPaymentParams.setAddress("ADDRESS") //required field(*)
-        pgPaymentParams.setPostalCode("POSTAL_CODE") //required field(*)
-        pgPaymentParams.setCity("CITY") //required field(*)
-        pgPaymentParams.setRegion("REGION") //required field(*)
-        pgPaymentParams.setCountry("IND") //required field(*)
+        pgPaymentParams.setApiKey(response.getString(Const.API_KEY)) //required field(*)
+        pgPaymentParams.setSecureHash(response.getString(Const.SECURE_HASH)) //required field(*)
+        pgPaymentParams.setOrderReference(response.getString(Const.ORDER_REFERENCE)) //required field(*)
+        pgPaymentParams.setCustomerName(response.getString(Const.CUSTOMER_NAME)) //required field(*)
+        pgPaymentParams.setCustomerEmail(response.getString(Const.CUSTOMER_MAIL)) //required field(*)
+        pgPaymentParams.setCustomerMobile(response.getString(Const.CUSTOMER_MOBILE)) //required field(*)
+        pgPaymentParams.setAddress(response.getString(Const.ADDRESS)) //required field(*)
+        pgPaymentParams.setPostalCode(response.getString(Const.POSTAL_CODE)) //required field(*)
+        pgPaymentParams.setCity(response.getString(Const.CITY)) //required field(*)
+        pgPaymentParams.setRegion(response.getString(Const.REGION)) //required field(*)
+        pgPaymentParams.setCountry(response.getString(Const.COUNTRY)) //required field(*)
 
         //// optional parameters
-        pgPaymentParams.setDeliveryAddress("")
-        pgPaymentParams.setDeliveryCustomerName("")
-        pgPaymentParams.setDeliveryCustomerMobile("")
-        pgPaymentParams.setDeliveryPostalCode("")
-        pgPaymentParams.setDeliveryCity("");
-        pgPaymentParams.setDeliveryRegion("")
-        pgPaymentParams.setDeliveryCountry("IND")
+        pgPaymentParams.setDeliveryAddress(response.getString(Const.DELIVERY_ADDRESS))
+        pgPaymentParams.setDeliveryCustomerName(response.getString(Const.DELIVERY_CUSTOMER_ADDRESS))
+        pgPaymentParams.setDeliveryCustomerMobile(response.getString(Const.DELIVERY_CUSTOMER_MOBILE))
+        pgPaymentParams.setDeliveryPostalCode(response.getString(Const.DELIVERY_POSTAL_CODE))
+        pgPaymentParams.setDeliveryCity(response.getString(Const.DELIVERY_CITY))
+        pgPaymentParams.setDeliveryRegion(response.getString(Const.DELIVERY_REGION))
+        pgPaymentParams.setDeliveryCountry(response.getString(Const.DELIVERY_COUNTRY))
 
         val pgPaymentInitializer =
             BasisPayPaymentInitializer(pgPaymentParams, this@MainActivity,
-                "YOUR_RETURN_URL",
-            "YOUR_PG_CONNECT_URL")
+                response.getString(Const.RETURN_URL),
+            false) //TEST = false or LIVE = true
         pgPaymentInitializer.initiatePaymentProcess()
     }
 
@@ -72,7 +115,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         val response = JSONObject(paymentResponse)
                         Log.d("Res", response.toString())
-                        val referenceNo = response.getString("referenceNumber")
+                        val referenceNo = response.getString("referenceNo")
                         val success = response.getBoolean("success")
 
                         binding.tv1.text = "Reference No: $referenceNo"

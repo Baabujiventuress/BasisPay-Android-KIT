@@ -18,8 +18,8 @@ dependencyResolutionManagement {
 Step 2. Add the dependency in app module build.gradle file
 ```
 dependencies {
-			//Tag replace to latest version:- 1.0.2
-	        implementation 'com.github.Baabujiventuress:basispay-pgsdkv2-ktx:Tag'
+			//Tag replace to latest version:- 1.0.5
+	        implementation 'com.github.Baabujiventuress:basispay-pgsdkv2-ktx:1.0.5'
 	}
 
 ```
@@ -30,8 +30,45 @@ Make sure you have the below permissions in your manifest file:
 ```
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 ```
+Get order reference and secure hash from backend rest api services
+````
+private fun initiate() {
+        //TODO After get the response to set params for payment action
+        var url: URL? = URL("http://example.com") // Backend api
+        val connection: HttpURLConnection = url?.openConnection() as HttpURLConnection
+
+        try {
+            val br = BufferedReader(InputStreamReader(connection.getInputStream()))
+
+            // use a string builder to bufferize the response body
+            // read from the input strea.
+            val sb = StringBuilder()
+            var line: String?
+            while (br.readLine().also { line = it } != null) {
+                sb.append(line).append('\n')
+            }
+
+            // use the string builder directly,
+            // or convert it into a String
+            response = JSONObject(sb.toString())
+            Log.d("RES", response.toString())
+            //TODO Get ORDER REFERENCE ID form backend api
+            /**
+             *if (response.isSuccessful) {
+            if (response.code() == 200) {
+            response = response.body()
+            }
+            }
+             */
+        } finally {
+            connection.disconnect()
+        }
+
+    }
+````
 Check the imports in payment activity
 ```
 import com.basispaypg.BasisPayPGConstants
@@ -41,34 +78,35 @@ import com.basispaypg.BasisPayPaymentParams
 ```
 Make sure you have the below payment params in your payment activity class file:
 ```
- val pgPaymentParams = BasisPayPaymentParams()
-        pgPaymentParams.setApiKey("YOUR_API_KEY") //required field(*)
-        pgPaymentParams.setSecureHash("YOUR_SECURE_HASH") //required field(*)
-        pgPaymentParams.setOrderReference("YOUR_REFERENCE_NO") //required field(*)
-        pgPaymentParams.setCustomerName("XXXXX") //required field(*)
-        pgPaymentParams.setCustomerEmail("XXXXX") //required field(*)
-        pgPaymentParams.setCustomerMobile("XXXXX") //required field(*)
-        pgPaymentParams.setAddress("XXXXX") //required field(*)
-        pgPaymentParams.setPostalCode("XXXX") //required field(*)
-        pgPaymentParams.setCity("XXXX") //required field(*)
-        pgPaymentParams.setRegion("XXXX") //required field(*)
-        pgPaymentParams.setCountry("XXX") //required field(*)
+        val pgPaymentParams = BasisPayPaymentParams()
+        pgPaymentParams.setApiKey(response.getString(Const.API_KEY)) //required field(*)
+        pgPaymentParams.setSecureHash(response.getString(Const.SECURE_HASH)) //required field(*)
+        pgPaymentParams.setOrderReference(response.getString(Const.ORDER_REFERENCE)) //required field(*)
+        pgPaymentParams.setCustomerName(response.getString(Const.CUSTOMER_NAME)) //required field(*)
+        pgPaymentParams.setCustomerEmail(response.getString(Const.CUSTOMER_MAIL)) //required field(*)
+        pgPaymentParams.setCustomerMobile(response.getString(Const.CUSTOMER_MOBILE)) //required field(*)
+        pgPaymentParams.setAddress(response.getString(Const.ADDRESS)) //required field(*)
+        pgPaymentParams.setPostalCode(response.getString(Const.POSTAL_CODE)) //required field(*)
+        pgPaymentParams.setCity(response.getString(Const.CITY)) //required field(*)
+        pgPaymentParams.setRegion(response.getString(Const.REGION)) //required field(*)
+        pgPaymentParams.setCountry(response.getString(Const.COUNTRY)) //required field(*)
 
         //// optional parameters
-        pgPaymentParams.setDeliveryAddress("XXXX")
-        pgPaymentParams.setDeliveryCustomerName("XXXX")
-        pgPaymentParams.setDeliveryCustomerMobile("XXXX")
-        pgPaymentParams.setDeliveryPostalCode("XXXX")
-        pgPaymentParams.setDeliveryCity("XXXX");
-        pgPaymentParams.setDeliveryRegion("XXXX")
-        pgPaymentParams.setDeliveryCountry("XXX")
+        pgPaymentParams.setDeliveryAddress(response.getString(Const.DELIVERY_ADDRESS))
+        pgPaymentParams.setDeliveryCustomerName(response.getString(Const.DELIVERY_CUSTOMER_ADDRESS))
+        pgPaymentParams.setDeliveryCustomerMobile(response.getString(Const.DELIVERY_CUSTOMER_MOBILE))
+        pgPaymentParams.setDeliveryPostalCode(response.getString(Const.DELIVERY_POSTAL_CODE))
+        pgPaymentParams.setDeliveryCity(response.getString(Const.DELIVERY_CITY))
+        pgPaymentParams.setDeliveryRegion(response.getString(Const.DELIVERY_REGION))
+        pgPaymentParams.setDeliveryCountry(response.getString(Const.DELIVERY_COUNTRY))
    
 ```      
 Initailize the com.basispaypg.BasisPayPaymentInitializer class with payment parameters and initiate the payment:
 ```
-val pgPaymentInitializer =
+        val pgPaymentInitializer =
             BasisPayPaymentInitializer(pgPaymentParams, this@MainActivity,
-                "YOUR_RETURN_URL","YOUR_PG_CONNECT_URL")
+                response.getString(Const.RETURN_URL),
+            false) //TEST = false or LIVE = true
         pgPaymentInitializer.initiatePaymentProcess()
 
 ```
@@ -90,7 +128,7 @@ To receive the json response, override the onActivityResult() using the REQUEST_
                     } else {
                         val response = JSONObject(paymentResponse)
                         Log.d("Res", response.toString())
-                        val referenceNo = response.getString("referenceNumber")
+                        val referenceNo = response.getString("referenceNo")
                         val success = response.getBoolean("success")
 
                     }
